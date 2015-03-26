@@ -13,6 +13,7 @@
 from cal_vector import cal_vector
 
 class user(object): 
-    def __init__(self,u_id,i_list ={}):
+    def __init__(self,u_id,i_vec = {},t_vec = {}):
         self.user_id = u_id
-        self.item_list = i_list
+        self.item_feat = cal_vector(i_vec)
+        self.time_feat = cal_vector(t_vec)

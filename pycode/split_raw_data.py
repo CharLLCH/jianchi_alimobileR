@@ -8,59 +8,77 @@
  * Mail:charlley88@163.com
 **************************
 '''
-import sys
-sys.path.append("..")
 
-from util.read_conf import config
+'''
+    非17-18的，不是4的，且不在17-18-4的u和i的，随便抽2w4
+    17-18的，不是4且不和17-18-4对应的u和i冲突的，随便抽2w4
+    正例就17 18的所有的 u-i-4
+'''
+import sys
+sys.path.append('..')
 
 from csv import DictReader
-from datetime import datetime
+from random import random
+from util.read_conf import config
 import pickle
 
 raw_data = config('../conf/raw_data.conf')
-usr_path = raw_data['usr_train_path']
+raw_78_path = raw_data['u_te_time']
+raw_ot_path = raw_data['u_tr_time']
 
-# TODO transform the date time format.
-def date_transform(item_time):
-    "trans the time to 1-7 & 1-24"
-    #feat[0:4]=Y,[5:7]=M,[8,10]=D,[-2:]=H
-    time_feat = datetime(int(item_time[0:4]),int(item_time[5:7]),int(item_time[8:10]))
-    hour_feat = item_time[-2:]
-    
-    week_feat = time_feat.strftime("%A")
+idx_list = ['user_id','item_id','behavior_type','user_geohash','item_category','time']
 
-    tmp = week_feat+'-'+hour_feat
-    return tmp
+# TODO 先抽正例，然后列一个禁止list，抽出来的直接存起来吧
+def get_positive_item(paths):
+    "get the positive item and the u-i dict."
 
-# TODO get the target product that some one buy or add into the car.
-def get_target_product(tar_path):
-    "traverse the list, and find the target list of the product id."
+    pi_list = []
+    ban_list = []
 
-    print 'open the file of ',tar_path
-    infile = open(tar_path,'rb')
-
-    ui_dict = {}
-    counts = 0
+    infile = open(paths['u_te_time'],'rb')
     
     for idx, row in enumerate(DictReader(infile)):
         
-        if row['behavior_type'] == '3' or row['behavior_type'] == '4':
-            counts += 1
-            if row['user_id'] in ui_dict:
-                # 是否该将其他的信息都加上呢，如果一个人在不同时间地点买过同一个id的商品两次得区分开啊
-                date_feat = date_transform(row['time'])
-                tmp = ',' + row['item_id'] + '-' + date_feat
-                ui_dict[row['user_id']] += tmp
-                #print ui_dict[row['user_id']]
-            else:
-                ui_dict[row['user_id']] = row['item_id']
-        if (idx+1) % 1000000 == 0:
-            print (idx+1)/1000000,'m'
+        if row['behavior_type'] == '4':
+            if row['user_id'] not in ban_list:
+                ban_list.append((row['user_id'],row['item_id']))
+                tmp = ','.join([row[key] for key in idx_list])
+                pi_list.append(tmp)
+    infile.close() 
 
-    #将购买信息
-    outfile = open(raw_data['usr_pur_path'],'wb')
-    pickle.dump(ui_dict,outfile,True)
-    print 'get the puchase items.'
+    hold_num = 24000
+
+    counts = 0
+    ng78_list = []
+
+    infile = open(paths['u_te_time'],'rb')
+    for idx, row in enumerate(DictReader(infile)):
+        if row['behavior_type'] != '4':
+            if (row['user_id'],row['item_id']) not in ban_list:
+                if random() > 0.95 and counts < 24000:
+                    tmp = ','.join([row[key] for key in idx_list])
+                    ng78_list.append(tmp)
+                    counts += 1
+        if counts >= hold_num:
+            print idx
+            break
+    infile.close()
+
+    counts = 0
+    ng_list = []
+
+    infile = open(paths['u_tr_time'],'rb')
+    for idx, row in enumerate(DictReader(infile)):
+        if row['behavior_type'] != '4':
+            if (row['user_id'],row['item_id']) not in ban_list:
+                if random() > 0.98 and counts < 2400:
+                    tmp = ','.join([row[key] for key in idx_list])
+                    ng_list.append(tmp)
+                    counts += 1
+        if counts >= hold_num:
+            print idx
+            break
+    
 
 if __name__ == "__main__":
-    get_target_product(usr_path)
+    get_positive_item(raw_data)

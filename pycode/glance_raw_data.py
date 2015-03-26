@@ -13,7 +13,6 @@
     * 简单的统计
     × 1. 统计出来一共有多少user/item/position
     × 2. 统计出来多少购买/点击/收藏/购物车
-    × 3. 内积！？
 '''
 import sys
 sys.path.append("..")
