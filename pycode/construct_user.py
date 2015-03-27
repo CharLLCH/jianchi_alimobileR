@@ -20,6 +20,7 @@ from util.read_conf import config
 from util.user import user
 from util.sim_func import user_sim
 import unittest
+import csv
 import pickle
 
 raw_data = config('../conf/raw_data.conf')
@@ -78,19 +79,27 @@ def construc_user_matrix(ui_path):
         user_dict[key] = user(key,tmp[0],tmp[1]) 
 
     # TODO 直接算出来了吧
-    sim_dict = {}
+    #sim_dict = {}
+    fieldnames = ['user_1','user_2','similarity']
+    writer = csv.writer(file(raw_data['u_u_sim_time'],'wb'))
+    writer.writerow(fieldnames)
     idx = 0
     print 'start to calculate the sim_matrix.'
     for f_key in user_dict:
         for s_key in user_dict:
             if int(s_key) > int(f_key):
                 sim = us_func.sim(user_dict[f_key],user_dict[s_key])
-                sim_dict[s_key+'-'+f_key] = sim
+                #sim_dict[s_key+'-'+f_key] = sim
+                row = [s_key,f_key,sim]
+                writer.writerow(row)
         idx += 1
-        print 'No.',idx,'products has got the sim.'
+        #print 'No.',idx,'products has got the sim.'
+        if idx % 99 == 0:
+            print idx+1,'users.'
 
-    outfile = open(raw_data['u_u_sim_time'],'wb')
-    pickle.dump(sim_dict,outfile,True)
+    # TODO 直接存上吧，不然后面速度太慢
+    #outfile = open(raw_data['u_u_sim_time'],'wb')
+    #pickle.dump(sim_dict,outfile,True)
     print 'sim_matrix has saved.'
 
     
