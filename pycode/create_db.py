@@ -41,7 +41,7 @@ def create():
     sql_str = "use alibaba"
     cur.execute(sql_str)
 
-    sql_str = "CREATE table user_train (user char(13),item char(13), behavoir tinyint,ugeo char(10),icat char(10),ubdate date,ubhour tinyint, index idx1(user(13)),index idx2(item(13)),index idx3(ugeo),index idx4(icat),index idx5(ubdate))"
+    sql_str = "CREATE table user_train (user char(13),item char(13), behavoir tinyint,ugeo char(10),icat char(10),ubdate date,ubhour tinyint, index idx1(user(8)),index idx2(item(8)),index idx3(ugeo),index idx4(icat),index idx5(ubdate))"
     cur.execute(sql_str)
     
     conn.commit()
