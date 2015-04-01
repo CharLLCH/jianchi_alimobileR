@@ -9,135 +9,124 @@
 **************************
 '''
 '''
-    counts = 0
-    ng_list = []
-
-    infile = open(paths['u_tr_time'],'rb')
-    for idx, row in enumerate(DictReader(infile)):
-        if row['behavior_type'] != '4':
-            if (row['user_id'],row['item_id']) not in ban_list:
-                if random() > 0.98 and counts < 24000:
-                    tmp = ','.join([row[key] for key in idx_list])
-                    ng_list.append(tmp)
-                    counts += 1
-        if counts >= hold_num:
-            print idx
-            break
-    if counts < hold_num:
-        print 'still not enough.'
-    infile.close()
-
-    #infile_tr = open(paths['u_tr_time'],'rb')
-    #for idx, row in enumerate(DictReader(infile_tr)):
-    #    if row['behavior_type'] != '4':
-    #        if (row['user_id'],row['item_id']) not in ban_list:
-    #            if random() > 0.9 and counts < 2400:
-    #                tmp = ','.join([row[key] for key in idx_list])
-    #                ng_list.append(tmp)
-    #                counts += 1
-    #    if counts >= hold_num:
-    #        print idx
-    #        break
-    #infile_tr.close()
+    # 重写split函数，不是路径定死的，传入数据，获得ban_list等
+    # 对于同样类型的数据集，直接可使用
 '''
 
-'''
-    非17-18的，不是4的，且不在17-18-4的u和i的，随便抽2w4
-    17-18的，不是4且不和17-18-4对应的u和i冲突的，随便抽2w4
-    正例就17 18的所有的 u-i-4
-'''
 import sys
 sys.path.append('..')
 
 from csv import DictReader,writer
 from random import random
-from util.read_conf import config
+from util.get_item import get_raw_conf
 import pickle
-
-raw_data = config('../conf/raw_data.conf')
-raw_78_path = raw_data['u_te_time']
-raw_ot_path = raw_data['u_tr_time']
+import logging
 
 idx_list = ['user_id','item_id','behavior_type','user_geohash','item_category','time']
 
-# TODO 先抽正例，然后列一个禁止list，抽出来的直接存起来吧
-def get_positive_item(paths):
-    "get the positive item and the u-i dict."
-
+# TODO 获得正例items和ban_list
+def get_posban_list(data_path,pi_path):
+    ''' get the positive items and the ban_list'''
     pi_list = []
     ban_list = []
 
-    infile = open(paths['u_te_time'],'rb')
-    
+    infile = open(data_path,'rb')
     for idx, row in enumerate(DictReader(infile)):
-        
         if row['behavior_type'] == '4':
-            if row['user_id'] not in ban_list:
+            if (row['user_id'],row['item_id']) not in ban_list:
                 ban_list.append((row['user_id'],row['item_id']))
-                #tmp = ','.join([row[key] for key in idx_list])
-                tmp = [row[key] for key in idx_list]
-                pi_list.append(tmp)
-    infile.close() 
-    hold_num = 12000
-    counts = 0
-    ng78_list = []
-    infile = open(paths['u_te_time'],'rb')
+                pi_list.append([row[key] for key in idx_list])
+    print 'total positive items are : ',len(pi_list)
+    infile.close()
+
+    pi_file = open(pi_path,'wb')
+    pickle.dump(pi_list,pi_file,True)
+
+    return ban_list
+
+# TODO 根据ban_list和raw数据获得负例list
+def get_nag_list(data_path,ng_path,ban_list,max_num):
+    '''get the nagetive items'''
+    ng_list = []
+    num_ng = 0
+
+    infile = open(data_path,'rb')
     for idx, row in enumerate(DictReader(infile)):
         if row['behavior_type'] == '1':
             if (row['user_id'],row['item_id']) not in ban_list:
-                if random() > 0.96 and counts < 24000:
-                    #tmp = ','.join([row[key] for key in idx_list])
-                    tmp = [row[key] for key in idx_list]
-                    ng78_list.append(tmp)
-                    counts += 1
-        if counts >= hold_num:
-            print idx
+                if random() > 0.93 and num_ng < max_num:
+                    ng_list.append([row[key] for key in idx_list])
+                    num_ng += 1
+                    if num_ng % 100 == 0:
+                        print 'get num : ',num_ng,'nagtive items'
+        if num_ng >= max_num:
+            print 'sampling at the index : ',idx
             break
     infile.close()
-    outfile_78 = open(paths['u_te_rand_8'],'wb')
-    rand_writer_78 = writer(outfile_78)
-    
-    rand_writer_78.writerow(idx_list)
 
-    num_positive = len(pi_list)
-    num_nagetive = len(ng78_list)
+    ng_file = open(ng_path,'wb')
+    pickle.dump(ng_list,ng_file,True)
 
-    print len(pi_list),len(ng78_list)
+# TODO 根据两个数据集，将正负例合并到一起
+def merge_pos_ng(pi_path,ng_path,final_path):
+    '''merge the positive items and the nagetive items'''
+    pi_list = pickle.load(open(pi_path,'rb'))
+    ng_list = pickle.load(open(ng_path,'rb'))
+
+    outfile = open(final_path,'wb')
+    rand_writer = writer(outfile)
+    rand_writer.writerow(idx_list)
 
     idx_pos = 0
     idx_nag = 0
+    n_pos = len(pi_list)
+    n_nag = len(ng_list)
 
     while(1):
         rand = random()
-        if idx_pos < num_positive:
+        if idx_pos < n_pos:
             if rand < 0.25:
-                # insert the pos_item
-                #rand_writer.writerow(pi_list[idx_pos])
-                rand_writer_78.writerow(pi_list[idx_pos])
+                rand_writer.writerow(pi_list[idx_pos])
                 idx_pos += 1
             else:
-                if idx_nag < num_nagetive:
-                    #insert the nagetive_item
-                    #rand_writer.writerow(ng_list[idx_nag])
-                    rand_writer_78.writerow(ng78_list[idx_nag])
+                if idx_nag < n_nag:
+                    rand_writer.writerow(ng_list[idx_nag])
                     idx_nag += 1
                 else:
-                    #insert the pos_item
-                    #rand_writer.writerow(pi_list[idx_pos])
-                    rand_writer_78.writerow(pi_list[idx_pos])
+                    rand_writer.writerow(pi_list[idx_pos])
                     idx_pos += 1
         else:
-            if idx_nag < num_nagetive:
-                #insert nag_item
-                #rand_writer.writerow(ng_list[idx_nag])
-                rand_writer_78.writerow(ng78_list[idx_nag])
+            if idx_nag < n_nag:
+                rand_writer.writerow(ng_list[idx_nag])
                 idx_nag += 1
             else:
                 break
 
-    outfile_78.close()
-    #outfile.close()
-    
-    
+    print 'total split_items :',idx_nag+idx_pos,'pos_items:',idx_pos,'nag_items:',idx_nag
+
+    outfile.close()
+
 if __name__ == "__main__":
-    get_positive_item(raw_data)
+
+    raw_data = get_raw_conf()
+    pi_path = '../result/pi_tmp.pkl'
+    ng_path = '../result/ng_tmp.pkl'
+
+    opt = sys.argv[1]
+    if opt not in ['train','test']:
+        logging.error('option is wrong.')
+        sys.exit(1)
+    elif opt == 'train':
+        # split the train dataset.
+        data_path = raw_data['u_tr_time']
+        out_path = raw_data['u_tr_rand']
+        max_num = 400000
+    else:
+        # split the test dataset.
+        data_path = raw_data['u_te_time']
+        out_path = raw_data['u_te_rand']
+        max_num = 12000
+
+    ban_list = get_posban_list(data_path,pi_path)
+    get_nag_list(data_path,ng_path,ban_list,max_num)
+    merge_pos_ng(pi_path,ng_path,out_path)
