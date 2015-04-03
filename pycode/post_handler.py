@@ -28,8 +28,8 @@ except Exception as err:
 cur = conn.cursor()
 cur.execute('use %s'%(db_conf['db_name']))
 
-infile = open('../data/tianchi_mobile_recommendation_predict.csv','rb')
-outfile = open('../tianchi_mobile_recommendation_predict.csv','wb')
+infile = open('../result/zt_sub.csv','rb')
+outfile = open('../result/zt_post_7_123.csv','wb')
 
 count = 0
 idx = 0
@@ -67,10 +67,11 @@ for line in infile.readlines():
             if uc[0] == 4:
                 flags = False
                 break
-            elif uc[0] == 2 or uc[0] == 3:
-                flags = True
+            #elif uc[0] == 2 or uc[0] == 3:
+            #    flags = True
             else:
-                pass
+                #pass
+                flags = True
     if flags:
         idx += 1
         if idx % 100 == 0:
