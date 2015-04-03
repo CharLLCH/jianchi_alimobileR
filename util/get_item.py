@@ -31,9 +31,8 @@ def get_raw_conf():
 def get_db_conf():
     return db_conf
 
-def get_one_item(op='train'):
-    infile = open(raw_conf['u_tr_rand_ad'],'rb')
-    #infile = open(raw_conf['u_te_rand_8'],'rb')
+def get_one_item(op,data_path):
+    infile = open(data_path,'rb')
     
     for idx,row in enumerate(DictReader(infile)):
         s_item = item(row['user_id'],row['item_id'],row['behavior_type'],row['item_category'],row['time'],row['user_geohash'])

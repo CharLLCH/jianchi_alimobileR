@@ -39,7 +39,7 @@ except Exception as err:
 cur = conn.cursor()
 cur.execute("use %s"%(db_conf['db_name']))
 
-pre_day = 15
+pre_day = 30
 item_cat_num = 4
 
 
@@ -94,18 +94,20 @@ def get_user_item(u_id,i_id,date_time,flags):
 
 # TODO 构建出来feat的维度
 def get_fields():
-    fields = ['b_type','i_cat']
+    fields = ['i_cat']
     tmp_dict = construct_feat_dict()
     for key in tmp_dict:
         fields.append('ui_%s'%(key))
     for key in tmp_dict:
         fields.append('i_%s'%(key))
+    for key in tmp_dict:
+        fields.append('u_%s'%(key))
 
     return fields
 
 
 # TODO 合并两个featdict
-def merge_feats(feat_path):
+def merge_feats(data_path,feat_path,click_path):
     '''暂时将两个dict合并成一个'''
     # 先将fields确定下来
     fields = get_fields()
@@ -115,15 +117,17 @@ def merge_feats(feat_path):
 
     # 每次得到一个item
 
-    click_file = open(raw_conf['f_tr_rand_click'],'w')
+    click_file = open(click_path,'w')
 
-    items = get_one_item()
+    items = get_one_item('train',data_path)
     count = 0
 
     for item in items:
         ui_dict = get_user_item(item.user_id,item.item_id,item.date,'ui')
         i_dict = get_user_item(item.user_id,item.item_id,item.date,'i')
+        u_dict = get_user_item(item.user_id,item.item_id,item.date,'u')
         tmp_dict = dict(ui_dict,**i_dict)
+        tmp_dict = dict(tmp_dict,**u_dict)
         r_dict = item.get_field_dict()
         final_dict = dict(tmp_dict,**r_dict)
 
@@ -144,10 +148,30 @@ def merge_feats(feat_path):
     click_file.close()
 
 
-def main():
-    '''e..'''
-    merge_feats(raw_conf['f_tr_rand'])
+def main(flags):
+    '''要给定一个读取数据的path，一个存放feat的path，一个存放click的path'''
+    '''
+        老是会特征抽取冲突，每次注意一点
+    '''
+
+    if flags == 'train':
+        data_path = raw_conf['u_tr_rand']
+        feat_path = raw_conf['f_tr_rand']
+        click_path = raw_conf['f_tr_rand_click']
+    else:
+        data_path = raw_conf['u_te_time']
+        feat_path = raw_conf['f_te_rand']
+        click_path = raw_conf['f_te_rand_click']
+
+    merge_feats(data_path,feat_path,click_path)
 
 
 if __name__ == "__main__":
-    main()
+    opt = sys.argv[1]
+    if opt not in ['train','test']:
+        logging.error('option is not right.')
+        sys.exit(1)
+    elif opt == 'train':
+        main('train')
+    else:
+        main('test')

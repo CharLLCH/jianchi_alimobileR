@@ -18,8 +18,10 @@ import mysql.connector
 import logging
 
 from util.item import item
-from util.get_item import get_db_conf,get_one_item
+from util.get_item import get_db_conf,get_one_item,get_raw_conf
 
+raw_conf = get_raw_conf()
+data_path = raw_conf['u_tr_time']
 dbconf = get_db_conf()
 
 host = dbconf['host']
@@ -46,7 +48,7 @@ def create():
     
     conn.commit()
 
-    items = get_one_item()
+    items = get_one_item('train',data_path)
     count = 0
 
     for s_item in items:

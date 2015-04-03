@@ -54,7 +54,7 @@ def get_nag_list(data_path,ng_path,ban_list,max_num):
     for idx, row in enumerate(DictReader(infile)):
         if row['behavior_type'] == '1':
             if (row['user_id'],row['item_id']) not in ban_list:
-                if random() > 0.93 and num_ng < max_num:
+                if random() > 0.7 and num_ng < max_num:
                     ng_list.append([row[key] for key in idx_list])
                     num_ng += 1
                     if num_ng % 100 == 0:
@@ -85,7 +85,7 @@ def merge_pos_ng(pi_path,ng_path,final_path):
     while(1):
         rand = random()
         if idx_pos < n_pos:
-            if rand < 0.25:
+            if rand < 0.15:
                 rand_writer.writerow(pi_list[idx_pos])
                 idx_pos += 1
             else:
@@ -119,8 +119,9 @@ if __name__ == "__main__":
     elif opt == 'train':
         # split the train dataset.
         data_path = raw_data['u_tr_time']
-        out_path = raw_data['u_tr_rand']
-        max_num = 400000
+        #out_path = raw_data['u_tr_rand']
+        out_path = '../data/new_tr_rand.csv'
+        max_num = 1000000
     else:
         # split the test dataset.
         data_path = raw_data['u_te_time']

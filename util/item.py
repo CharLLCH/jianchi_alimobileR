@@ -52,14 +52,20 @@ class item:
 
     def get_field_dict(self):
         #fields = ['u_id', 'i_id', 'b_type','u_geo','i_cat']
-        fields = ['b_type','i_cat']
+        fields = ['i_cat']
         f_dict = dict.fromkeys(fields,0)
-        #f_dict['u_id'] = self.user_id
-        #f_dict['i_id'] = self.item_id
-        f_dict['b_type'] = self.behavior_type
         #f_dict['u_geo'] = self.user_geohash
         f_dict['i_cat'] = self.item_category
+        return f_dict
 
+    def new_feat(self):
+        fields = ['u_geo','i_cat','week','hour']
+        f_dict = dict.fromkeys(fields,0)
+        f_dict['u_geo'] = self.user_geohash
+        f_dict['i_cat'] = self.item_category
+        f_dict['week'] = self.week_f
+        #f_dict['date'] = self.date
+        f_dict['hour'] = self.hour_f
         return f_dict
 
 
