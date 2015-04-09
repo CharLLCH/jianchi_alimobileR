@@ -16,8 +16,8 @@ import pickle
 
 raw_data = get_raw_conf()
 
-tr_path = raw_data['f_tr_rand']
-cr_path = raw_data['f_tr_rand_click']
+#tr_path = raw_data['f_tr_rand']
+#cr_path = raw_data['f_tr_rand_click']
 te_path = raw_data['f_te_rand']
 ce_path = raw_data['f_te_rand_click']
 
@@ -38,20 +38,20 @@ def get_click_vector(y_path):
 
 if __name__ == "__main__":
     print "start to dump the data..."
-    tr_x = get_train_matrix(tr_path)
-    tr_y = get_click_vector(cr_path)
+#    tr_x = get_train_matrix(tr_path)
+#    tr_y = get_click_vector(cr_path)
     te_x = get_train_matrix(te_path)
     te_y = get_click_vector(ce_path)
 
-    infile = open(raw_data['tr_x'],'wb')
-    pickle.dump(tr_x,infile,True)
-    infile.close()
-    print 'tr_x dumped...'
-
-    infile = open(raw_data['tr_y'],'wb')
-    pickle.dump(tr_y,infile,True)
-    infile.close()
-    print 'tr_y dumped...'
+#    infile = open(raw_data['tr_x'],'wb')
+#    pickle.dump(tr_x,infile,True)
+#    infile.close()
+#    print 'tr_x dumped...'
+#
+#    infile = open(raw_data['tr_y'],'wb')
+#    pickle.dump(tr_y,infile,True)
+#    infile.close()
+#    print 'tr_y dumped...'
 
     infile = open(raw_data['te_x'],'wb')
     pickle.dump(te_x,infile,True)

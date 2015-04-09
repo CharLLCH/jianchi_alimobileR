@@ -24,7 +24,10 @@ class item:
         self.user_id = uid
         self.item_id = iid
         self.behavior_type = behavior
-        self.user_geohash = ugeo
+        if ugeo == '':
+            self.user_geohash = 'null'
+        else:
+            self.user_geohash = ugeo
         self.item_category = icat
         self.week = datetime(int(time[0:4]),int(time[5:7]),int(time[8:10]))
         time = time.split()
@@ -58,14 +61,16 @@ class item:
         f_dict['i_cat'] = self.item_category
         return f_dict
 
+    # 自身的dict内容有待考虑
     def new_feat(self):
-        fields = ['u_geo','i_cat','week','hour']
+        fields = ['u_geo','i_cat','week','hour','click']
         f_dict = dict.fromkeys(fields,0)
         f_dict['u_geo'] = self.user_geohash
         f_dict['i_cat'] = self.item_category
         f_dict['week'] = self.week_f
         #f_dict['date'] = self.date
         f_dict['hour'] = self.hour_f
+        f_dict['click'] = self.behavior_type
         return f_dict
 
 

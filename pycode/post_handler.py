@@ -29,7 +29,8 @@ cur = conn.cursor()
 cur.execute('use %s'%(db_conf['db_name']))
 
 infile = open('../result/zt_sub.csv','rb')
-outfile = open('../result/zt_post_7_123.csv','wb')
+outfile = open('../result/zt_post_15_123.csv','wb')
+outfile.write('user_id,item_id\n')
 
 count = 0
 idx = 0
@@ -63,15 +64,17 @@ for line in infile.readlines():
     flags = False
     for uc in uc_result:
         day_dis = (target_date - uc[1]).days
-        if day_dis <= 7:
-            if uc[0] == 4:
-                flags = False
-                break
+        if day_dis <= 15:
+            flags = True
+            break
+            #if uc[0] == 4:
+            #    flags = False
+            #    break
             #elif uc[0] == 2 or uc[0] == 3:
             #    flags = True
-            else:
+            #else:
                 #pass
-                flags = True
+            #    flags = True
     if flags:
         idx += 1
         if idx % 100 == 0:

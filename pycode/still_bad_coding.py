@@ -146,15 +146,10 @@ def merge_feat(feat_path,data_path):
     '''TODO save the feat_line(in what some format)'''
     # 写feat
     out_file = open(feat_path,'wb')
-    # 写click
-    #click_file = open(click_file,'wb')
 
-    # 获得
     truths = get_one_item('train',data_path)
 
     count = 0
-
-    fields_line = []
 
     for idx in truths:
         # one by one
@@ -164,7 +159,6 @@ def merge_feat(feat_path,data_path):
         i_feat = what_the_hell_feat(idx,'i')
         c_feat = what_the_hell_feat(idx,'c')
         # based on what tools write the feat_dict
-        
         #label [importance tag]|namespace feats feats |namespace feats ..
         
         str_line = ''
