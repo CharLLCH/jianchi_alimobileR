@@ -59,5 +59,6 @@ conf/
 pycode/code_ignore/
 *.csv
 *.rule
+*.gz
 ftrldata/zc/
 ftrldata/with_geo/
