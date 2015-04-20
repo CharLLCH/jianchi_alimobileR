@@ -58,3 +58,5 @@ data/
 conf/
 pycode/code_ignore/
 *.csv
+*.rule
+ftrldata/zc/
