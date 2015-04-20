@@ -60,3 +60,4 @@ pycode/code_ignore/
 *.csv
 *.rule
 ftrldata/zc/
+ftrldata/with_geo/
