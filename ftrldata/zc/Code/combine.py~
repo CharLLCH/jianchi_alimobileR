@@ -1,7 +1,0 @@
-class Feature:
-    def __init__(self):
-        pass
-    def get_complex_feature(self, x):
-        return __nochange__(self,x)
-    def __nochanege__(self,x):
-        return x
