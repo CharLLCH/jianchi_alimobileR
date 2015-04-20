@@ -30,7 +30,7 @@ def get_mydb():
     mdb = mydb(host=host,user=user,passwd=passwd,port=3306)
     return mdb    
 
-max_day = 30
+max_day = 7
 
 #单线程的先这么写着
 mdb = get_mydb()
@@ -177,8 +177,8 @@ class c_i(feature_time_beh):
 
 
 normal_list = []
-#append_list = [u_i,y_h,s_p]
-append_list = [s_p]
+append_list = [u_i,y_h,s_p]
+#append_list = [s_p]
 
 #def main(data_set):
 def main(data_set,types):

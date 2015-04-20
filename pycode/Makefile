@@ -25,10 +25,6 @@ adjust_set : gen_dataset.py ../util/get_item.py
 gen_total_feat : gen_feature.py gen_catfeat.py ../util/item.py ../util/get_item.py
 	time python gen_feature.py -d train -t normal
 	time python gen_feature.py -d test -t normal
-	time python gen_feature.py -d pred -t normal
-	time pypy gen_catfeat.py -d train
-	time pypy gen_catfeat.py -d test
-	time pypy gen_catfeat.py -d pred
 
 gen_train_feat : gen_feature.py gen_catfeat.py  ../util/item.py ../util/get_item.py
 	time python gen_feature.py -d train -t normal

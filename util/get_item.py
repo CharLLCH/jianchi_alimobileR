@@ -52,6 +52,7 @@ def get_item(dt='total',op="train"):
         f = open(raw_conf['n_tr_time'])
     elif dt == 'test':
         f = open(raw_conf['n_te_time'])
+        #f = open('../data/w_te_rand.csv')
     elif dt == 'pred':
         f = open(raw_conf['test_set'])
     else:
