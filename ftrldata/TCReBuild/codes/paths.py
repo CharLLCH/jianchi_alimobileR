@@ -1,0 +1,1 @@
+clf = '../models/clf.pkl'

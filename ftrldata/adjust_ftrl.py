@@ -178,9 +178,9 @@ def data(f_train, D, dayfilter = None, dayfeature = True, counters = False):
 
     for t, row in enumerate(DictReader(f_train)):
         # TODO ID : user_id + item_id ID用用户和商品的id代替
-        ID = row['uid'] + '-' + row['iid']
-        del row['uid']
-        del row['iid']
+        ID = row['user_id'] + '-' + row['item_id']
+        del row['user_id']
+        del row['item_id']
         # TODO label 正负例，写到dataset中
         y = 0.
         if 'label' in row:
@@ -190,6 +190,9 @@ def data(f_train, D, dayfilter = None, dayfeature = True, counters = False):
 
         if dayfilter != None and not date in dayfilter:
             continue
+
+        if 'proba' in row:
+            del row['proba']
 
         # TODO 后面是调整或者抽取了相应的东西，剩下来的就直接堆到vector里就好了
         x = [0]  # 0 is the index of the bias term

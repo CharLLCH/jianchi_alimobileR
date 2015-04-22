@@ -60,5 +60,12 @@ pycode/code_ignore/
 *.csv
 *.rule
 *.gz
+*.pkl
+*.libfm
+*.x
+*.y
+*.ids
 ftrldata/zc/
 ftrldata/with_geo/
+*.out
+*.swp
